@@ -27,10 +27,10 @@ def main():
 
             # 変数が2つ以上ある場合の回帰分析
             if len(data.columns) > 1:
-                input_feature = st.selectbox('回帰分析の入力特徴を選択してください', data.columns)
+                input_features = st.multiselect('回帰分析の入力特徴を選択してください', data.columns, key='input_features')
                 output_feature = st.selectbox('回帰分析の出力特徴を選択してください', data.columns)
                 model = LinearRegression()
-                model.fit(data[[input_feature]], data[output_feature])
+                model.fit(data[input_features], data[output_feature])
                 st.write('特徴の回帰係数: ', model.coef_)
 
         else:
