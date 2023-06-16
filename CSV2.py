@@ -41,17 +41,20 @@ def main():
         # Visualization
         graph_type = st.selectbox('Select graph type', ['scatter', 'bar', 'line', 'pie'])
         x_axes = st.multiselect('Select x-axes for the graph', data.columns, key='x_axes')
-        y_axis = st.selectbox('Select y-axis for the graph', data.columns, key='y_axis')
+        y_axes = st.multiselect('Select y-axes for the graph', data.columns, key='y_axes')
         fig, ax = plt.subplots()  # Create a new figure for each plot
         if graph_type == 'scatter':
             for x in x_axes:
-                sns.scatterplot(x=data[x], y=data[y_axis], ax=ax)
+                for y in y_axes:
+                    sns.scatterplot(x=data[x], y=data[y], ax=ax)
         elif graph_type == 'bar':
             for x in x_axes:
-                sns.barplot(x=data[x], y=data[y_axis], ax=ax)
+                for y in y_axes:
+                    sns.barplot(x=data[x], y=data[y], ax=ax)
         elif graph_type == 'line':
             for x in x_axes:
-                sns.lineplot(x=data[x], y=data[y_axis], ax=ax)
+                for y in y_axes:
+                    sns.lineplot(x=data[x], y=data[y], ax=ax)
         elif graph_type == 'pie':
             if np.issubdtype(data[column].dtype, np.number):
                 st.write('Pie chart is not suitable for numerical data')
