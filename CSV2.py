@@ -6,64 +6,64 @@ import seaborn as sns
 from sklearn.linear_model import LinearRegression
 
 def main():
-    st.title('CSV Data Analysis App')
+    st.title('CSVデータ分析アプリ')
 
-    # Upload CSV data
-    file = st.file_uploader("Upload a CSV file", type=['csv'])
+    # CSVデータのアップロード
+    file = st.file_uploader("CSVファイルをアップロードしてください", type=['csv'])
     if file is not None:
         data = pd.read_csv(file)
         st.dataframe(data)
 
-        # Select column to view statistics
-        column = st.selectbox('Select column for analysis', data.columns)
+        # 統計情報を表示する列を選択
+        column = st.selectbox('分析する列を選択してください', data.columns)
         selected_data = data[column]
 
         if np.issubdtype(data[column].dtype, np.number):
-            st.write('Statistics for numerical column')
-            st.write('Max: ', np.max(selected_data))
-            st.write('Min: ', np.min(selected_data))
-            st.write('Mean: ', np.mean(selected_data))
-            st.write('Std deviation: ', np.std(selected_data))
+            st.write('数値列の統計')
+            st.write('最大値: ', np.max(selected_data))
+            st.write('最小値: ', np.min(selected_data))
+            st.write('平均: ', np.mean(selected_data))
+            st.write('標準偏差: ', np.std(selected_data))
 
-            # Regression analysis for two or more variables
+            # 変数が2つ以上ある場合の回帰分析
             if len(data.columns) > 1:
-                input_feature = st.selectbox('Select input feature for regression', data.columns)
-                output_feature = st.selectbox('Select output feature for regression', data.columns)
+                input_feature = st.selectbox('回帰分析の入力特徴を選択してください', data.columns)
+                output_feature = st.selectbox('回帰分析の出力特徴を選択してください', data.columns)
                 model = LinearRegression()
                 model.fit(data[[input_feature]], data[output_feature])
-                st.write('Regression coefficient for features: ', model.coef_)
+                st.write('特徴の回帰係数: ', model.coef_)
 
         else:
-            st.write('Statistics for non-numerical column')
-            st.write('Total count: ', len(selected_data))
-            st.write('Unique count: ', len(np.unique(selected_data)))
+            st.write('非数値列の統計')
+            st.write('総数: ', len(selected_data))
+            st.write('ユニークな値の数: ', len(np.unique(selected_data)))
 
-        # Visualization
-        graph_type = st.selectbox('Select graph type', ['scatter', 'bar', 'line', 'pie'])
-        x_axes = st.multiselect('Select x-axes for the graph', data.columns, key='x_axes')
-        y_axes = st.multiselect('Select y-axes for the graph', data.columns, key='y_axes')
-        fig, ax = plt.subplots()  # Create a new figure for each plot
-        if graph_type == 'scatter':
+        # 可視化
+        graph_type = st.selectbox('グラフの種類を選択してください', ['散布図', '棒グラフ', '折れ線グラフ', '円グラフ'])
+        x_axes = st.multiselect('グラフのx軸を選択してください', data.columns, key='x_axes')
+        y_axes = st.multiselect('グラフのy軸を選択してください', data.columns, key='y_axes')
+        fig, ax = plt.subplots()  # 各プロットに新しい図を作成
+        if graph_type == '散布図':
             for x in x_axes:
                 for y in y_axes:
                     sns.scatterplot(x=data[x], y=data[y], ax=ax)
-        elif graph_type == 'bar':
+        elif graph_type == '棒グラフ':
             for x in x_axes:
                 for y in y_axes:
                     sns.barplot(x=data[x], y=data[y], ax=ax)
-        elif graph_type == 'line':
+        elif graph_type == '折れ線グラフ':
             for x in x_axes:
                 for y in y_axes:
                     sns.lineplot(x=data[x], y=data[y], ax=ax)
-        elif graph_type == 'pie':
+        elif graph_type == '円グラフ':
             if np.issubdtype(data[column].dtype, np.number):
-                st.write('Pie chart is not suitable for numerical data')
+                st.write('円グラフは数値データには適していません')
             else:
                 data[column].value_counts().plot.pie(autopct="%.1f%%", ax=ax)
         else:
-            st.write('Appropriate graph could not be created')
+            st.write('適切なグラフを作成できませんでした')
 
-        # Show the plot
+        # プロットを表示
         st.pyplot(fig)
 
 if __name__ == "__main__":
