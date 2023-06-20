@@ -42,7 +42,7 @@ def main():
             st.write('ユニークな値の数: ', len(np.unique(selected_data)))
 
         # 可視化
-        graph_type = st.selectbox('グラフの種類を選択してください', ['散布図', '棒グラフ', '折れ線グラフ', '円グラフ'])
+        graph_type = st.selectbox('グラフの種類を選択してください', ['散布図', '棒グラフ', '折れ線グラフ', '円グラフ', '重回帰分析', '単回帰分析'])
         x_axes = st.multiselect('グラフのx軸を選択してください', data.columns, key='x_axes')
         y_axes = st.multiselect('グラフのy軸を選択してください', data.columns, key='y_axes')
         fig, ax = plt.subplots()  # 各プロットに新しい図を作成
@@ -50,19 +50,42 @@ def main():
             for x in x_axes:
                 for y in y_axes:
                     sns.scatterplot(x=data[x], y=data[y], ax=ax)
+                    ax.set_title(f'{x}と{y}の散布図')
         elif graph_type == '棒グラフ':
             for x in x_axes:
                 for y in y_axes:
-                    sns.barplot(x=data[x], y=data[y], ax=ax)
+                    sns.barplot(x=data[x], y=data[y],ax=ax)
+                    ax.set_title(f'{x}と{y}の棒グラフ')
         elif graph_type == '折れ線グラフ':
             for x in x_axes:
                 for y in y_axes:
                     sns.lineplot(x=data[x], y=data[y], ax=ax)
+                    ax.set_title(f'{x}と{y}の折れ線グラフ')
         elif graph_type == '円グラフ':
             if np.issubdtype(data[column].dtype, np.number):
                 st.write('円グラフは数値データには適していません')
             else:
                 data[column].value_counts().plot.pie(autopct="%.1f%%", ax=ax)
+                ax.set_title(f'{column}の円グラフ')
+        elif graph_type == '重回帰分析':
+            if len(input_features) > 1 and np.issubdtype(data[output_feature].dtype, np.number):
+                for feature in input_features:
+                    if np.issubdtype(data[feature].dtype, np.number):
+                        sns.regplot(x=data[feature], y=model.predict(data[input_features]), ax=ax)
+                        ax.set_title(f'{feature}と予測値の重回帰分析')
+                    else:
+                        st.write(f'重回帰分析は数値データに対してのみ適用可能です: {feature} 列は数値データではありません')
+            else:
+                st.write('重回帰分析には少なくとも2つの数値入力特徴が必要です')
+        elif graph_type == '単回帰分析':
+            if len(input_features) == 1 and np.issubdtype(data[output_feature].dtype, np.number):
+                if np.issubdtype(data[input_features[0]].dtype, np.number):
+                    sns.regplot(x=data[input_features[0]], y=data[output_feature], ax=ax)
+                    ax.set_title(f'{input_features[0]}と{output_feature}の単回帰分析')
+                else:
+                    st.write(f'単回帰分析は数値データに対してのみ適用可能です: {input_features[0]} 列は数値データではありません')
+            else:
+                st.write('単回帰分析には1つの数値入力特徴が必要です')
         else:
             st.write('適切なグラフを作成できませんでした')
 
